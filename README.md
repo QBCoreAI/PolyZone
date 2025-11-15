@@ -3,30 +3,39 @@ PolyZone is a FiveM mod to define zones of different shapes and test whether a p
 
 ![PolyZone around the prison](https://i.imgur.com/InKNaoL.jpg)
 
+## Repository Layout
+
+The core runtime now lives under the [`Poly/`](Poly) directory to keep the project self-contained and easier to embed in other resources.
+
+- `Poly/init.lua` exposes shared utilities used by both the client and server runtime.
+- `Poly/client/` contains the PolyZone base class, helper utilities, and the optimized zone implementations.
+- `Poly/server/` contains the lightweight server helpers and the zone creation endpoints.
+- `Poly/creation/` bundles the optional zone-creation tooling for both client and server.
+
 ## Download
 
 Click [here](https://github.com/mkafrin/PolyZone/releases) to go to the releases page and download the latest release
 
 ## Using PolyZone in a Script
 
-In order to use PolyZone in your script, you must _at least_ include PolyZone's client.lua directly in your __resource.lua or fxmanifest.lua. You can do that by using FiveM's @ syntax for importing resource files:
+In order to use PolyZone in your script, you must _at least_ include PolyZone's client entry point directly in your __resource.lua or fxmanifest.lua. You can do that by using FiveM's @ syntax for importing resource files:
 
 ```lua
 client_scripts {
-    '@PolyZone/client.lua',
+    '@PolyZone/Poly/client/base.lua',
     'your_scripts_client.lua',
 }
 ```
 
-This will allow you to create PolyZones in your script, but will not import other zones, such as CircleZone, BoxZone, etc. All the other zones are extra, and require their own explicit imports. Here is a `client_scripts` value that will include all the zones. Note the relative order of these imports, as the ordering is necessary! Many zones rely on each other, for example EntityZone inherits from BoxZone, and all zones inherit from PolyZone (client.lua).
+This will allow you to create PolyZones in your script, but will not import other zones, such as CircleZone, BoxZone, etc. All the other zones are extra, and require their own explicit imports. Here is a `client_scripts` value that will include all the zones. Note the relative order of these imports, as the ordering is necessary! Many zones rely on each other, for example EntityZone inherits from BoxZone, and all zones inherit from the shared PolyZone base module.
 
 ```lua
 client_scripts {
-  '@PolyZone/client.lua',
-  '@PolyZone/BoxZone.lua',
-  '@PolyZone/EntityZone.lua',
-  '@PolyZone/CircleZone.lua',
-  '@PolyZone/ComboZone.lua',
+  '@PolyZone/Poly/client/base.lua',
+  '@PolyZone/Poly/client/zones/BoxZone.lua',
+  '@PolyZone/Poly/client/zones/EntityZone.lua',
+  '@PolyZone/Poly/client/zones/CircleZone.lua',
+  '@PolyZone/Poly/client/zones/ComboZone.lua',
   'your_scripts_client.lua'
 }
 ```
@@ -39,7 +48,7 @@ For help troubleshooting issues you've encountered (that aren't in the FAQ), or 
 
 ## FAQ - Frequently Asked Questions
 **I'm getting the error `attempt to index a nil value` when creating a zone, what's wrong?**
-> Did you include all the necessary scripts in your \_\_resource.lua or fxmanifest.lua? Remember some zones require other zones, like EntityZone.lua requires BoxZone.lua and BoxZone.lua requires client.lua.
+> Did you include all the necessary scripts in your \_\_resource.lua or fxmanifest.lua? Remember some zones require other zones, like EntityZone.lua requires BoxZone.lua and BoxZone.lua requires the base PolyZone module.
 
 **I'm getting no errors, but I can't see my zone in the right place when I turn on debug drawing**
 > If you are using them, is minZ and maxZ set correctly? Or if you are using a CircleZone with useZ=true, is your center's Z value correct? If using a PolyZone, did you manually select all your points, or use the creation script? If you did it manually, the ordering of the points could be causing issues. Are you using the correct option to enable debug drawing? For PolyZones, you can use `debugPoly` and `debugGrid`, but for other zones, `debugPoly` is the only one that works.
