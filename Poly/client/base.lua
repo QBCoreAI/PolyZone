@@ -216,6 +216,22 @@ local function _pointInPoly(point, poly)
     return false
   end
 
+  -- Early exit by comparing planar distance to the polygon's bounding radius, mirroring BoxZone.
+  -- The bounding box rejection happens first so obvious misses skip the extra distance math entirely.
+  local center = poly.center
+  local boundingRadius = poly.boundingRadius
+  if center and boundingRadius then
+    local dx = x - center.x
+    local dy = y - center.y
+    if (dx * dx + dy * dy) > (boundingRadius * boundingRadius) then
+      local profiler = poly.profiler
+      if profiler then
+        profiler.distanceCulls = (profiler.distanceCulls or 0) + 1
+      end
+      return false
+    end
+  end
+
   -- Returns true if the grid cell associated with the point is entirely inside the poly
   local grid = poly.grid
   if grid then
@@ -232,7 +248,18 @@ local function _pointInPoly(point, poly)
       gridCellValue = _isGridCellInsidePoly(gridCellX, gridCellY, poly)
       grid[gridIndex] = gridCellValue
     end
-    if gridCellValue then return true end
+    if gridCellValue then
+      local profiler = poly.profiler
+      if profiler then
+        profiler.gridHits = (profiler.gridHits or 0) + 1
+      end
+      return true
+    end
+  end
+
+  local profiler = poly.profiler
+  if profiler then
+    profiler.wnEvaluations = (profiler.wnEvaluations or 0) + 1
   end
 
   return _windingNumber(point, poly.points)
@@ -414,6 +441,7 @@ local function _calculatePoly(poly, options)
   end
 
   poly.boundingRadius = sqrt(poly.size.y * poly.size.y + poly.size.x * poly.size.x) / 2
+  poly.profiler = poly.profiler or {distanceCulls = 0, gridHits = 0, wnEvaluations = 0}
 
   if poly.useGrid and not poly.lazyGrid then
     if options.debugGrid then
@@ -509,6 +537,16 @@ function PolyZone:destroy()
   self.destroyed = true
   if self.debugPoly or self.debugGrid then
     print("[PolyZone] Debug: Destroying zone {name=" .. self.name .. "}")
+    local profiler = self.profiler
+    if profiler then
+      print(string.format(
+        "[PolyZone] Debug: Stats {name=%s, wn=%d, gridHits=%d, distanceCulls=%d}",
+        tostring(self.name),
+        profiler.wnEvaluations or 0,
+        profiler.gridHits or 0,
+        profiler.distanceCulls or 0
+      ))
+    end
   end
 end
 
