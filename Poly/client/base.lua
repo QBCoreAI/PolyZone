@@ -1,9 +1,16 @@
 eventPrefix = '__PolyZone__:'
 PolyZone = {}
 
+local utils = Poly.utils
+PolyZone.rotate = utils.rotate2D
+
 local defaultColorWalls = {0, 255, 0}
 local defaultColorOutline = {255, 0, 0}
 local defaultColorGrid = {255, 255, 255}
+
+local sqrt = math.sqrt
+local min = math.min
+local max = math.max
 
 -- Utility functions
 local abs = math.abs
@@ -214,14 +221,16 @@ local function _pointInPoly(point, poly)
   if grid then
     local gridDivisions = poly.gridDivisions
     local size = poly.size
+    local normalizeGrid = poly.gridNormalizer
     local gridPosX = x - minX
     local gridPosY = y - minY
-    local gridCellX = (gridPosX * gridDivisions) // size.x
-    local gridCellY = (gridPosY * gridDivisions) // size.y
-    local gridCellValue = grid[gridCellY + 1][gridCellX + 1]
+    local gridCellX = normalizeGrid((gridPosX * gridDivisions) // size.x)
+    local gridCellY = normalizeGrid((gridPosY * gridDivisions) // size.y)
+    local gridIndex = gridCellY * gridDivisions + gridCellX + 1
+    local gridCellValue = grid[gridIndex]
     if gridCellValue == nil and poly.lazyGrid then
       gridCellValue = _isGridCellInsidePoly(gridCellX, gridCellY, poly)
-      grid[gridCellY + 1][gridCellX + 1] = gridCellValue
+      grid[gridIndex] = gridCellValue
     end
     if gridCellValue then return true end
   end
@@ -358,11 +367,11 @@ local function _createGrid(poly, options)
     local gridCellArea = poly.gridCellWidth * poly.gridCellHeight
     for y=1, poly.gridDivisions do
       Citizen.Wait(0)
-      isInside[y] = {}
+      local rowOffset = (y - 1) * poly.gridDivisions
       for x=1, poly.gridDivisions do
         if _isGridCellInsidePoly(x-1, y-1, poly) then
           poly.gridArea = poly.gridArea + gridCellArea
-          isInside[y][x] = true
+          isInside[rowOffset + x] = true
         end
       end
     end
@@ -392,10 +401,10 @@ local function _calculatePoly(poly, options)
     local minX, minY = math.maxinteger, math.maxinteger
     local maxX, maxY = math.mininteger, math.mininteger
     for _, p in ipairs(poly.points) do
-      minX = math.min(minX, p.x)
-      minY = math.min(minY, p.y)
-      maxX = math.max(maxX, p.x)
-      maxY = math.max(maxY, p.y)
+      minX = min(minX, p.x)
+      minY = min(minY, p.y)
+      maxX = max(maxX, p.x)
+      maxY = max(maxY, p.y)
     end
     poly.min = vector2(minX, minY)
     poly.max = vector2(maxX, maxY)
@@ -404,7 +413,7 @@ local function _calculatePoly(poly, options)
     poly.area = _calculatePolygonArea(poly.points)
   end
 
-  poly.boundingRadius = math.sqrt(poly.size.y * poly.size.y + poly.size.x * poly.size.x) / 2
+  poly.boundingRadius = sqrt(poly.size.y * poly.size.y + poly.size.x * poly.size.x) / 2
 
   if poly.useGrid and not poly.lazyGrid then
     if options.debugGrid then
@@ -414,11 +423,7 @@ local function _calculatePoly(poly, options)
     end
     _createGrid(poly, options)
   elseif poly.useGrid then
-    local isInside = {}
-    for y=1, poly.gridDivisions do
-      isInside[y] = {}
-    end
-    poly.grid = isInside
+    poly.grid = {}
     poly.gridCellWidth = poly.size.x / poly.gridDivisions
     poly.gridCellHeight = poly.size.y / poly.gridDivisions
   end
@@ -470,6 +475,7 @@ function PolyZone:new(points, options)
     useGrid = useGrid,
     lazyGrid = lazyGrid,
     gridDivisions = tonumber(options.gridDivisions) or 30,
+    gridNormalizer = nil,
     debugColors = options.debugColors or {},
     debugPoly = options.debugPoly or false,
     debugGrid = options.debugGrid or false,
@@ -477,6 +483,7 @@ function PolyZone:new(points, options)
     isPolyZone = true,
   }
   if poly.debugGrid then poly.lazyGrid = false end
+  poly.gridNormalizer = utils.buildGridCoordinateNormalizer(poly.gridDivisions)
   _calculatePoly(poly, options)
   setmetatable(poly, self)
   self.__index = self
