@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PolyZone Settings</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="status-bar" aria-label="Device status bar">
+        <span class="status-brand">PolyZone</span>
+        <div class="status-icons" aria-hidden="true">
+          <span class="status-icon">📶</span>
+          <span class="status-icon">📡</span>
+          <span class="status-icon">🔋</span>
+        </div>
+      </header>
+
+      <main class="settings">
+        <h1 class="settings-title">Settings</h1>
+
+        <section class="profile-card" aria-labelledby="profile-title">
+          <div class="profile-avatar" aria-hidden="true">
+            <span>JD</span>
+          </div>
+          <div class="profile-details">
+            <h2 id="profile-title">John Doe</h2>
+            <p class="profile-subtitle">Administrator</p>
+          </div>
+          <button class="profile-action" type="button" aria-label="Open profile">
+            <span aria-hidden="true">›</span>
+          </button>
+        </section>
+
+        <section class="settings-section" aria-label="Connectivity">
+          <article class="setting-card">
+            <div class="setting-icon wifi" aria-hidden="true">📶</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Wi-Fi</h3>
+              <p class="setting-subtitle">PolyZone Office</p>
+            </div>
+            <label class="setting-toggle" aria-label="Wi-Fi">
+              <input type="checkbox" checked />
+              <span class="toggle-track"></span>
+            </label>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon bluetooth" aria-hidden="true">🅱️</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Bluetooth</h3>
+              <p class="setting-subtitle">Enabled for controllers</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open Bluetooth settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon mobile" aria-hidden="true">📡</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Cellular</h3>
+              <p class="setting-subtitle">QBCore LTE</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open cellular settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+        </section>
+
+        <section class="settings-section" aria-label="Preferences">
+          <article class="setting-card">
+            <div class="setting-icon notifications" aria-hidden="true">🔔</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Notifications</h3>
+              <p class="setting-subtitle">Push and sound alerts</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open notification settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon display" aria-hidden="true">🖥️</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Display &amp; Brightness</h3>
+              <p class="setting-subtitle">Adaptive with night shift</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open display settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon sounds" aria-hidden="true">🎧</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Sounds</h3>
+              <p class="setting-subtitle">PolyZone tone</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open sound settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+        </section>
+
+        <section class="settings-section" aria-label="System">
+          <article class="setting-card">
+            <div class="setting-icon storage" aria-hidden="true">💾</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Storage</h3>
+              <p class="setting-subtitle">128 GB of 256 GB used</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open storage settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon security" aria-hidden="true">🔒</div>
+            <div class="setting-content">
+              <h3 class="setting-title">Security</h3>
+              <p class="setting-subtitle">Face ID and passcode</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open security settings">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+
+          <article class="setting-card">
+            <div class="setting-icon about" aria-hidden="true">ℹ️</div>
+            <div class="setting-content">
+              <h3 class="setting-title">About</h3>
+              <p class="setting-subtitle">PolyZone device information</p>
+            </div>
+            <button class="setting-link" type="button" aria-label="Open about screen">
+              <span aria-hidden="true">›</span>
+            </button>
+          </article>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>
